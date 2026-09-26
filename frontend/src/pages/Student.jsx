@@ -26,6 +26,19 @@ export default function Student() {
     fetchTickets();
   }, [navigate]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is larger than 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image is too large! Please select a file smaller than 5MB.");
+        e.target.value = ""; // Clear the input
+        setImage(null);
+        return;
+      }
+      setImage(file);
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -96,7 +109,7 @@ export default function Student() {
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">Room Number</label>
                 <input 
-                  type="text" required placeholder="e.g., A-204"
+                  type="number" min="1" required placeholder="e.g., 204"
                   className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-slate-50"
                   value={formData.roomNumber}
                   onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw } from 'lucide-react';
+import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw, Sparkles } from 'lucide-react';
 
 export default function Student() {
   const navigate = useNavigate();
@@ -77,146 +77,168 @@ export default function Student() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white pb-12">
-      {/* Glass Navbar */}
-      <nav className="bg-white/60 backdrop-blur-lg shadow-sm border-b border-white/80 sticky top-0 z-50 transition-all">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-slate-900 text-slate-100 relative font-sans overflow-x-hidden">
+      {/* Blueprint Dot Matrix & Subtle Ambient Lights */}
+      <div className="fixed inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
+      <div className="fixed top-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-0 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* Modern Top Header */}
+      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-xl shadow-md shadow-indigo-200">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center shadow-md shadow-indigo-500/20 border border-indigo-400/30">
               <Wrench className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-indigo-900">
-              Student Portal
-            </h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-white tracking-tight">Student Portal</h1>
+                <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">Active</span>
+              </div>
+              <p className="text-xs text-slate-400 hidden sm:block">Campus Hostel Maintenance</p>
+            </div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 bg-white/50 hover:bg-red-50 px-4 py-2 rounded-full transition-all border border-slate-200 hover:border-red-200">
-            <LogOut className="w-4 h-4" /> Logout
+          <button 
+            onClick={handleLogout} 
+            className="flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 px-3.5 py-2 rounded-xl transition border border-slate-700/80 hover:border-slate-600 shadow-sm"
+          >
+            <LogOut className="w-3.5 h-3.5 text-slate-400" />
+            <span>Sign Out</span>
           </button>
         </div>
-      </nav>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
-        <div className="lg:col-span-1">
-          {/* Glassmorphism Form Card */}
-          <div className="bg-white/60 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] border border-white/80 sticky top-28">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <Send className="w-5 h-5 text-indigo-500" /> New Request
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Category</label>
-                <select 
-                  className="w-full bg-white/70 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-medium text-slate-700"
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                >
-                  <option>Electrical</option>
-                  <option>Plumbing</option>
-                  <option>Carpentry</option>
-                  <option>Cleaning</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Room Number</label>
+      {/* Main Grid Content */}
+      <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Issue Submission Box */}
+        <section className="lg:col-span-1 bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-xl shadow-black/40">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+              <Send className="w-4 h-4" />
+            </div>
+            <h2 className="text-base font-bold text-white">Lodge a Request</h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Service Category</label>
+              <select 
+                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                value={formData.category}
+                onChange={(e) => setFormData({...formData, category: e.target.value})}
+              >
+                <option>Electrical</option>
+                <option>Plumbing</option>
+                <option>Carpentry</option>
+                <option>Cleaning</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Room Identifier</label>
+              <input 
+                type="number" min="1" required placeholder="e.g. 204"
+                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition placeholder-slate-500"
+                value={formData.roomNumber}
+                onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Description of Issue</label>
+              <textarea 
+                required rows="3" placeholder="Provide specific details of the defect..."
+                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition resize-none placeholder-slate-500"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Visual Proof (Max 5MB)</label>
+              <div className="relative border border-dashed border-slate-700 rounded-xl p-4 text-center bg-slate-800/40 hover:bg-slate-800 hover:border-indigo-500/60 transition-all cursor-pointer group">
                 <input 
-                  type="number" min="1" required placeholder="e.g., 204"
-                  className="w-full bg-white/70 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400"
-                  value={formData.roomNumber}
-                  onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}
+                  type="file" accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Description</label>
-                <textarea 
-                  required rows="3" placeholder="Describe the problem..."
-                  className="w-full bg-white/70 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 resize-none placeholder-slate-400"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Evidence (Max 5MB)</label>
-                <div className="relative border-2 border-dashed border-indigo-200 rounded-xl p-5 text-center bg-white/40 hover:bg-indigo-50/50 transition-colors group cursor-pointer">
-                  <input 
-                    type="file" accept="image/*"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="flex flex-col items-center justify-center gap-2 transform group-hover:scale-105 transition-transform">
-                    <div className="bg-indigo-100 p-2 rounded-full">
-                      <ImageIcon className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <span className="text-sm font-semibold text-indigo-900/70 px-2 line-clamp-1">
-                      {image ? image.name : 'Tap to upload photo'}
-                    </span>
-                  </div>
+                <div className="flex flex-col items-center justify-center gap-1.5">
+                  <ImageIcon className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs text-slate-300 truncate max-w-[200px]">
+                    {image ? image.name : 'Attach photograph'}
+                  </span>
                 </div>
               </div>
-              <button 
-                type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-indigo-200 disabled:opacity-50 shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300 transform hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-2"
-              >
-                {loading ? 'Submitting...' : 'Submit Request'}
-              </button>
-            </form>
-          </div>
-        </div>
+            </div>
 
-        <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <Clock className="w-6 h-6 text-indigo-500" /> My History
-            </h2>
+            <button 
+              type="submit" disabled={loading}
+              className="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-sm py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50 flex justify-center items-center gap-2"
+            >
+              {loading ? 'Submitting...' : 'Register Issue'}
+            </button>
+          </form>
+        </section>
+
+        {/* Tickets History */}
+        <section className="lg:col-span-2">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-400" />
+              <h2 className="text-base font-bold text-white">Your Lodged Tickets</h2>
+            </div>
             <button 
               onClick={fetchTickets}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-slate-200 text-slate-600 font-bold hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 rounded-full transition-all disabled:opacity-50 shadow-sm"
+              className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white rounded-lg border border-slate-700/80 text-xs font-medium transition disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              Refresh
+              <RefreshCw className={`w-3.5 h-3.5 text-indigo-400 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>Sync</span>
             </button>
           </div>
-          
-          <div className="space-y-5">
+
+          <div className="space-y-3.5">
             {tickets.length === 0 ? (
-              <div className="bg-white/60 backdrop-blur-xl p-12 rounded-3xl text-center border border-white/80 shadow-[0_8px_32px_rgba(0,0,0,0.04)] flex flex-col items-center">
-                <div className="bg-slate-100 p-4 rounded-full mb-4">
-                  <CheckCircle className="w-10 h-10 text-slate-400" />
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3">
+                  <CheckCircle className="w-6 h-6 text-slate-500" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-700">All caught up!</h3>
-                <p className="text-slate-500 font-medium mt-1">You have no active maintenance requests.</p>
+                <p className="text-slate-300 font-medium text-sm">No ongoing requests</p>
+                <p className="text-slate-500 text-xs mt-1">Submitted room issues will appear here in real time.</p>
               </div>
             ) : (
               tickets.map(ticket => (
-                <div key={ticket._id} className="bg-white/70 backdrop-blur-md p-5 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white/80 flex flex-col sm:flex-row gap-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <div key={ticket._id} className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 hover:border-slate-700 transition">
                   {ticket.imageUrl && (
-                    <img src={ticket.imageUrl} alt="Issue" className="w-full sm:w-48 h-36 object-cover rounded-2xl shadow-sm" />
+                    <img src={ticket.imageUrl} alt="Defect" className="w-full sm:w-36 h-28 object-cover rounded-xl border border-slate-800" />
                   )}
-                  <div className="flex-1 flex flex-col justify-center">
-                    <div className="flex justify-between items-start mb-3">
-                      <span className="bg-indigo-50 text-indigo-700 text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest border border-indigo-100">
-                        {ticket.category} • RM {ticket.roomNumber}
-                      </span>
-                      <span className={`px-4 py-1 rounded-full text-xs font-bold shadow-sm ${
-                        ticket.status === 'Pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 
-                        ticket.status === 'Assigned' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 
-                        'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                      }`}>
-                        {ticket.status}
-                      </span>
+                  <div className="flex-1 flex flex-col justify-between py-0.5">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-xs font-bold text-indigo-300 bg-indigo-950/70 border border-indigo-800/50 px-2.5 py-0.5 rounded-md">
+                          {ticket.category} • Room {ticket.roomNumber}
+                        </span>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                          ticket.status === 'Pending' ? 'bg-amber-950/50 text-amber-300 border-amber-800/60' :
+                          ticket.status === 'Assigned' ? 'bg-blue-950/50 text-blue-300 border-blue-800/60' :
+                          'bg-emerald-950/50 text-emerald-300 border-emerald-800/60'
+                        }`}>
+                          {ticket.status}
+                        </span>
+                      </div>
+                      <p className="text-slate-300 text-sm leading-relaxed">{ticket.description}</p>
                     </div>
-                    <p className="text-slate-700 text-[15px] mt-1 font-medium leading-relaxed">{ticket.description}</p>
-                    <p className="text-xs text-slate-400 mt-4 font-semibold uppercase tracking-wider flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {new Date(ticket.createdAt).toLocaleDateString()}
-                    </p>
+                    <span className="text-[11px] text-slate-500 font-medium mt-3">
+                      Recorded on {new Date(ticket.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               ))
             )}
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

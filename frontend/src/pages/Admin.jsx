@@ -32,6 +32,7 @@ export default function Admin() {
 
   useEffect(() => {
     fetchAllTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const updateStatus = async (ticketId, newStatus) => {

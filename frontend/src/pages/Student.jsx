@@ -32,6 +32,7 @@ export default function Student() {
 
   useEffect(() => {
     fetchTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const handleImageChange = (e) => {

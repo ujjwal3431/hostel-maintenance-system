@@ -91,6 +91,18 @@ export default function Admin() {
               <p className="text-slate-800 text-sm mb-3 font-medium leading-relaxed line-clamp-3">
                 {ticket.description}
               </p>
+
+              {/* --- RESTORED IMAGE BLOCK --- */}
+              {ticket.imageUrl && (
+                <div className="mb-3 overflow-hidden rounded-xl border border-white h-32 relative shadow-sm group/img">
+                  <img src={ticket.imageUrl} alt="Defect proof" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
+                  <a href={ticket.imageUrl} target="_blank" rel="noopener noreferrer" 
+                     className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
+                    View Full Image
+                  </a>
+                </div>
+              )}
+              {/* ----------------------------- */}
               
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-3 bg-slate-50/80 p-2 rounded-xl border border-slate-100">
                 <div className="bg-white p-1 rounded-full border border-slate-200"><User className="w-3 h-3 text-slate-400" /></div>

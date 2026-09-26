@@ -1,62 +1,64 @@
 const express = require('express');
+const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-const router = express.Router();
+// Assuming you have a User model in your models folder
+const User = require('../models/User'); 
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/google', async (req, res) => {
   try {
-    // 1. FIRST: Extract the token from the frontend request
+    // 1. Extract the token sent from the Vercel frontend
     const { token } = req.body; 
 
-    // 2. SECOND: Console log to check the Render environment variable
+    // 2. Debugging trap to see exactly what Render thinks the Client ID is
     console.log("THE RENDER CLIENT ID IS:", process.env.GOOGLE_CLIENT_ID);
 
-    // 3. THIRD: Verify the token (now it knows what 'token' is!)
+    // 3. Verify the token with Google
     const ticket = await client.verifyIdToken({
         idToken: token,
         audience: process.env.GOOGLE_CLIENT_ID
     });
 
+    // 4. Extract user details from the verified Google payload
     const payload = ticket.getPayload();
-    // ... the rest of your code (finding/creating the user) stays the same ...
-        const { sub, email, name } = payload; // 'sub' is the unique Google ID
-
-        // 2. Domain Restriction (Core feature for your project)
-        // Note: While building and testing, you might want to comment these 3 lines out
-        // so you can test with your personal @gmail.com account.
-        if (!email.endsWith('@gkv.ac.in')) {
-            return res.status(403).json({ message: 'Access restricted to university students only.' });
-        }
-
-        // 3. Find or Create the User in MongoDB
-        let user = await User.findOne({ googleId: sub });
-        if (!user) {
-            user = new User({
-                name: name,
-                email: email,
-                googleId: sub,
-                role: 'student' // Default role
-            });
-            await user.save();
-        }
-
-        // 4. Generate a secure JSON Web Token (JWT) for the session
-        const token = jwt.sign(
-            { userId: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' } // Keeps the student logged in for 7 days
-        );
-
-        // 5. Send token and user data back to the frontend
-        res.status(200).json({ token, user: { name: user.name, email: user.email, role: user.role } });
-        
-    } catch (error) {
-        console.error('Google Auth Error:', error);
-        res.status(401).json({ message: 'Authentication failed. Invalid token.' });
+    const { email, name, picture } = payload;
+    
+    // 5. Enforce University Domain Validation
+    if (!email.endsWith('@gkv.ac.in')) {
+        return res.status(403).json({ message: "Access denied. Please use a @gkv.ac.in email." });
     }
+
+    // 6. Find existing user, or create a new student account
+    let user = await User.findOne({ email });
+    if (!user) {
+        user = new User({
+            name: name,
+            email: email,
+            role: 'student', // By default, new logins are students
+            profilePicture: picture
+        });
+        await user.save();
+    }
+
+    // 7. Generate your backend's JWT token
+    // (Ensure you have a JWT_SECRET environment variable set in Render!)
+    const jwtToken = jwt.sign(
+        { id: user._id, role: user.role }, 
+        process.env.JWT_SECRET || 'fallback_secret_key_please_change', 
+        { expiresIn: '7d' }
+    );
+
+    // 8. Send the data back to the frontend to log the user in
+    res.status(200).json({ token: jwtToken, user });
+
+  } catch (error) {
+    // 9. Error Handler
+    console.error("Google Auth Error:", error);
+    res.status(401).json({ message: "Authentication failed. Invalid token." });
+  }
 });
 
 module.exports = router;

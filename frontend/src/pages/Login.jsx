@@ -37,7 +37,7 @@ export default function Login() {
         <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
           <Wrench className="w-8 h-8 text-blue-600" />
         </div>
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Hostel Care</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Testing 123</h1>
         <p className="text-gray-500 mb-8 font-medium">Faculty of Engineering & Technology</p>
         
         <div className="flex justify-center border-t border-gray-100 pt-8">

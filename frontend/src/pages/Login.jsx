@@ -37,7 +37,9 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate(res.data.user.role === 'admin' ? '/admin' : '/student');
     } catch (error) {
-      alert('Login failed. Please use your @gkv.ac.in email.');
+      console.error("FULL LOGIN ERROR:", error);
+      const errorMsg = error.response?.data?.message || error.message;
+      alert(`System Error: ${errorMsg}`);
     }
   };
 

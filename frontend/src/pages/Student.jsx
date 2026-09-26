@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench } from 'lucide-react';
-
+import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw } from 'lucide-react';
 export default function Student() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
@@ -11,18 +10,27 @@ export default function Student() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return navigate('/');
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setTickets(res.data);
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-      }
-    };
+    const [refreshing, setRefreshing] = useState(false); // Add this state
+
+  // Extracted fetch function so the button can call it
+  const fetchTickets = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return navigate('/');
+    
+    setRefreshing(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTickets(res.data);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTickets();
   }, [navigate]);
 
@@ -149,10 +157,19 @@ export default function Student() {
         </div>
 
         {/* Right Column: Ticket History */}
-        <div className="lg:col-span-2">
-          <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-slate-500" /> My Recent Requests
-          </h2>
+        <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-slate-500" /> My Recent Requests
+            </h2>
+            <button 
+              onClick={fetchTickets}
+              disabled={refreshing}
+              className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all disabled:opacity-50"
+              title="Refresh Tickets"
+            >
+              <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
           <div className="space-y-4">
             {tickets.length === 0 ? (
               <div className="bg-white p-10 rounded-2xl text-center border border-slate-100 shadow-sm flex flex-col items-center">

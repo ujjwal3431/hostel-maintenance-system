@@ -1,30 +1,36 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { LogOut, LayoutDashboard, ChevronRight, CheckCircle2, User } from 'lucide-react';
-
+import { LogOut, LayoutDashboard, ChevronRight, CheckCircle2, User, RefreshCw } from 'lucide-react';
 export default function Admin() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllTickets = async () => {
-      const token = localStorage.getItem('token');
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!token || user?.role !== 'admin') return navigate('/'); 
+    const [refreshing, setRefreshing] = useState(false); // Add this state
 
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setTickets(res.data);
-      } catch (error) {
-        alert('Unauthorized or server error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Extracted fetch function
+  const fetchAllTickets = async () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!token || user?.role !== 'admin') return navigate('/'); 
+
+    setRefreshing(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTickets(res.data);
+    } catch (error) {
+      alert('Unauthorized or server error');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAllTickets();
   }, [navigate]);
 
@@ -127,15 +133,26 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navbar */}
+      {/* Navbar */}
       <nav className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <LayoutDashboard className="w-6 h-6 text-indigo-600" />
             <h1 className="text-xl font-bold text-slate-800">Admin Dashboard</h1>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors">
-            <LogOut className="w-4 h-4" /> Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={fetchAllTickets}
+              disabled={refreshing}
+              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors bg-slate-100 hover:bg-blue-50 px-3 py-1.5 rounded-lg disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} /> 
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors">
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+          </div>
         </div>
       </nav>
 

@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw } from 'lucide-react';
+
 export default function Student() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [formData, setFormData] = useState({ category: 'Electrical', roomNumber: '', description: '' });
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const [refreshing, setRefreshing] = useState(false); // Add this state
-
-  // Extracted fetch function so the button can call it
   const fetchTickets = async () => {
     const token = localStorage.getItem('token');
     if (!token) return navigate('/');
@@ -38,16 +36,16 @@ export default function Student() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check if file is larger than 5MB
       if (file.size > 5 * 1024 * 1024) {
         alert("Image is too large! Please select a file smaller than 5MB.");
-        e.target.value = ""; // Clear the input
+        e.target.value = "";
         setImage(null);
         return;
       }
       setImage(file);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -80,7 +78,6 @@ export default function Student() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navbar */}
       <nav className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -94,7 +91,6 @@ export default function Student() {
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Form */}
         <div className="lg:col-span-1">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-24">
             <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -134,16 +130,18 @@ export default function Student() {
                 ></textarea>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Photo Evidence</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Photo Evidence (Max 5MB)</label>
                 <div className="relative border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:bg-slate-50 transition-colors">
                   <input 
                     type="file" accept="image/*"
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={handleImageChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
                   <div className="flex flex-col items-center justify-center gap-1">
                     <ImageIcon className="w-6 h-6 text-slate-400" />
-                    <span className="text-sm text-slate-500">{image ? image.name : 'Click to upload or drag & drop'}</span>
+                    <span className="text-sm text-slate-500 text-center px-2">
+                      {image ? image.name : 'Click to upload or drag & drop (Max 5MB)'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -157,8 +155,8 @@ export default function Student() {
           </div>
         </div>
 
-        {/* Right Column: Ticket History */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="lg:col-span-2">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <Clock className="w-5 h-5 text-slate-500" /> My Recent Requests
             </h2>

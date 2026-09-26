@@ -2,15 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { LogOut, LayoutDashboard, ChevronRight, CheckCircle2, User, RefreshCw } from 'lucide-react';
+
 export default function Admin() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const [refreshing, setRefreshing] = useState(false); // Add this state
-
-  // Extracted fetch function
   const fetchAllTickets = async () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
@@ -98,7 +96,6 @@ export default function Admin() {
                 <span className="truncate">{ticket.studentId?.name}</span>
               </div>
 
-              {/* Status Action Buttons */}
               <div className="flex gap-2 mt-auto">
                 {statusName !== 'Pending' && (
                   <button onClick={() => updateStatus(ticket._id, 'Pending')} className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 rounded-lg transition-colors">
@@ -133,8 +130,6 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navbar */}
-      {/* Navbar */}
       <nav className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">

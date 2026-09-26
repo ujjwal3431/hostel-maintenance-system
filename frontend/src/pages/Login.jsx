@@ -1,9 +1,23 @@
+import { useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Login() {
   const navigate = useNavigate();
+  // Check if user is already logged in when the page loads
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (token && user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/student');
+      }
+    }
+  }, [navigate]);
 
   const handleLoginSuccess = async (credentialResponse) => {
     try {

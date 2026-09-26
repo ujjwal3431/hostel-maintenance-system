@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { LogOut, LayoutDashboard, ChevronRight, CheckCircle2, User } from 'lucide-react';
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -11,11 +12,7 @@ export default function Admin() {
     const fetchAllTickets = async () => {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));
-      
-      // Kick them out if they aren't an admin
-      if (!token || user?.role !== 'admin') {
-        return navigate('/'); 
-      }
+      if (!token || user?.role !== 'admin') return navigate('/'); 
 
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
@@ -23,7 +20,6 @@ export default function Admin() {
         });
         setTickets(res.data);
       } catch (error) {
-        console.error('Error fetching tickets:', error);
         alert('Unauthorized or server error');
       } finally {
         setLoading(false);
@@ -39,13 +35,8 @@ export default function Admin() {
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` }}
       );
-      
-      // Update the UI instantly by modifying the local state
-      setTickets(tickets.map(t => 
-        t._id === ticketId ? { ...t, status: newStatus } : t
-      ));
+      setTickets(tickets.map(t => t._id === ticketId ? { ...t, status: newStatus } : t));
     } catch (error) {
-      console.error('Error updating status', error);
       alert('Failed to update status');
     }
   };
@@ -55,77 +46,104 @@ export default function Admin() {
     navigate('/');
   };
 
-  // Helper function to render a Kanban column
-  const renderColumn = (statusName, bgColor) => {
+  const renderColumn = (statusName, headerColor, bgColor, icon) => {
     const columnTickets = tickets.filter(t => t.status === statusName);
     
     return (
-      <div className={`p-4 rounded-lg min-h-[500px] ${bgColor}`}>
-        <h2 className="font-bold text-lg mb-4 flex justify-between items-center">
-          {statusName} 
-          <span className="bg-white px-2 py-1 rounded-full text-sm shadow-sm">{columnTickets.length}</span>
-        </h2>
+      <div className={`rounded-xl flex flex-col h-full border border-slate-200 ${bgColor}`}>
+        <div className={`p-4 border-b border-slate-200 flex justify-between items-center rounded-t-xl bg-white`}>
+          <h2 className={`font-bold flex items-center gap-2 ${headerColor}`}>
+            {icon} {statusName}
+          </h2>
+          <span className="bg-slate-100 text-slate-600 font-bold px-2.5 py-0.5 rounded-full text-sm">
+            {columnTickets.length}
+          </span>
+        </div>
         
-        <div className="space-y-4">
+        <div className="p-4 space-y-4 overflow-y-auto flex-1">
           {columnTickets.map(ticket => (
-            <div key={ticket._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-bold text-gray-500 uppercase">{ticket.category}</span>
-                <span className="text-xs font-bold bg-gray-100 px-2 py-1 rounded">Room {ticket.roomNumber}</span>
+            <div key={ticket._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all group">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-1 rounded">
+                  {ticket.category}
+                </span>
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                  Room {ticket.roomNumber}
+                </span>
               </div>
               
-              <p className="text-gray-800 text-sm mb-3">{ticket.description}</p>
+              <p className="text-slate-800 text-sm mb-4 leading-relaxed font-medium">
+                {ticket.description}
+              </p>
               
               {ticket.imageUrl && (
-                <a href={ticket.imageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 text-xs hover:underline block mb-3">
-                  View Attached Photo
-                </a>
+                <div className="mb-4 overflow-hidden rounded-lg border border-slate-100 h-32 relative">
+                  <img src={ticket.imageUrl} alt="Issue" className="w-full h-full object-cover" />
+                  <a href={ticket.imageUrl} target="_blank" rel="noopener noreferrer" 
+                     className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
+                    View Full Image
+                  </a>
+                </div>
               )}
               
-              <div className="text-xs text-gray-500 mb-4 border-t pt-2">
-                Reported by: {ticket.studentId?.name} ({ticket.studentId?.email})
+              <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 bg-slate-50 p-2 rounded-lg">
+                <User className="w-3 h-3" />
+                <span className="truncate">{ticket.studentId?.name}</span>
               </div>
 
               {/* Status Action Buttons */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-auto">
                 {statusName !== 'Pending' && (
-                  <button onClick={() => updateStatus(ticket._id, 'Pending')} className="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-bold py-1.5 rounded transition">
-                    Move to Pending
+                  <button onClick={() => updateStatus(ticket._id, 'Pending')} className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 rounded-lg transition-colors">
+                    Reset
                   </button>
                 )}
                 {statusName !== 'Assigned' && (
-                  <button onClick={() => updateStatus(ticket._id, 'Assigned')} className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-bold py-1.5 rounded transition">
+                  <button onClick={() => updateStatus(ticket._id, 'Assigned')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-xs font-bold py-2 rounded-lg transition-colors">
                     Assign Task
                   </button>
                 )}
                 {statusName !== 'Resolved' && (
-                  <button onClick={() => updateStatus(ticket._id, 'Resolved')} className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 text-xs font-bold py-1.5 rounded transition">
-                    Mark Resolved
+                  <button onClick={() => updateStatus(ticket._id, 'Resolved')} className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-sm text-xs font-bold py-2 rounded-lg transition-colors">
+                    Resolve
                   </button>
                 )}
               </div>
             </div>
           ))}
+          
+          {columnTickets.length === 0 && (
+            <div className="text-center p-8 text-slate-400 text-sm font-medium border-2 border-dashed border-slate-200 rounded-xl">
+              No tickets here
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
-  if (loading) return <div className="p-10 text-center">Loading Dashboard...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-blue-600 font-bold animate-pulse text-xl">Loading Dashboard...</div>;
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b pb-4">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard - Kanban Board</h1>
-          <button onClick={handleLogout} className="text-red-500 font-semibold hover:text-red-700">Logout</button>
+    <div className="min-h-screen bg-slate-50">
+      {/* Navbar */}
+      <nav className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-[1400px] mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <LayoutDashboard className="w-6 h-6 text-indigo-600" />
+            <h1 className="text-xl font-bold text-slate-800">Admin Dashboard</h1>
+          </div>
+          <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors">
+            <LogOut className="w-4 h-4" /> Logout
+          </button>
         </div>
+      </nav>
 
-        {/* The 3 Kanban Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {renderColumn('Pending', 'bg-yellow-50')}
-          {renderColumn('Assigned', 'bg-blue-50')}
-          {renderColumn('Resolved', 'bg-green-50')}
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {renderColumn('Pending', 'text-amber-600', 'bg-slate-50/50', <ChevronRight className="w-5 h-5" />)}
+          {renderColumn('Assigned', 'text-blue-600', 'bg-blue-50/30', <LayoutDashboard className="w-5 h-5" />)}
+          {renderColumn('Resolved', 'text-green-600', 'bg-green-50/30', <CheckCircle2 className="w-5 h-5" />)}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw, Sparkles } from 'lucide-react';
+import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw } from 'lucide-react';
 
 export default function Student() {
   const navigate = useNavigate();
@@ -77,32 +77,27 @@ export default function Student() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 relative font-sans overflow-x-hidden">
-      {/* Blueprint Dot Matrix & Subtle Ambient Lights */}
-      <div className="fixed inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
-      <div className="fixed top-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-0 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans pb-12">
+      {/* Subtle Background Pattern */}
+      <div className="fixed inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
 
-      {/* Modern Top Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+      {/* Crisp White Header */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center shadow-md shadow-indigo-500/20 border border-indigo-400/30">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
               <Wrench className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold text-white tracking-tight">Student Portal</h1>
-                <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">Active</span>
-              </div>
-              <p className="text-xs text-slate-400 hidden sm:block">Campus Hostel Maintenance</p>
+              <h1 className="text-base font-bold text-slate-800 tracking-tight">Student Portal</h1>
+              <p className="text-xs text-slate-500 font-medium hidden sm:block">GKV Hostel Maintenance</p>
             </div>
           </div>
           <button 
             onClick={handleLogout} 
-            className="flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 px-3.5 py-2 rounded-xl transition border border-slate-700/80 hover:border-slate-600 shadow-sm"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 bg-white hover:bg-red-50 px-4 py-2 rounded-xl transition border border-slate-200 hover:border-red-200 shadow-sm"
           >
-            <LogOut className="w-3.5 h-3.5 text-slate-400" />
+            <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </button>
         </div>
@@ -111,19 +106,19 @@ export default function Student() {
       {/* Main Grid Content */}
       <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Issue Submission Box */}
-        <section className="lg:col-span-1 bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-xl shadow-black/40">
+        <section className="lg:col-span-1 bg-white border border-slate-200 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24">
           <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-              <Send className="w-4 h-4" />
+            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+              <Send className="w-5 h-5" />
             </div>
-            <h2 className="text-base font-bold text-white">Lodge a Request</h2>
+            <h2 className="text-lg font-bold text-slate-800">New Request</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Service Category</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Category</label>
               <select 
-                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium"
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
               >
@@ -136,37 +131,39 @@ export default function Student() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Room Identifier</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Room Number</label>
               <input 
                 type="number" min="1" required placeholder="e.g. 204"
-                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition placeholder-slate-500"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium placeholder-slate-400"
                 value={formData.roomNumber}
                 onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Description of Issue</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Description</label>
               <textarea 
-                required rows="3" placeholder="Provide specific details of the defect..."
-                className="w-full bg-slate-800/70 border border-slate-700 text-slate-200 text-sm p-3 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition resize-none placeholder-slate-500"
+                required rows="3" placeholder="Describe the problem in detail..."
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium resize-none placeholder-slate-400"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Visual Proof (Max 5MB)</label>
-              <div className="relative border border-dashed border-slate-700 rounded-xl p-4 text-center bg-slate-800/40 hover:bg-slate-800 hover:border-indigo-500/60 transition-all cursor-pointer group">
+              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Photo (Max 5MB)</label>
+              <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-5 text-center bg-slate-50 hover:bg-blue-50/50 hover:border-blue-300 transition-all cursor-pointer group">
                 <input 
                   type="file" accept="image/*"
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <div className="flex flex-col items-center justify-center gap-1.5">
-                  <ImageIcon className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs text-slate-300 truncate max-w-[200px]">
-                    {image ? image.name : 'Attach photograph'}
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="bg-white p-2 rounded-full shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                    <ImageIcon className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-500 truncate max-w-[200px]">
+                    {image ? image.name : 'Click to attach photo'}
                   </span>
                 </div>
               </div>
@@ -174,63 +171,60 @@ export default function Student() {
 
             <button 
               type="submit" disabled={loading}
-              className="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-sm py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50 flex justify-center items-center gap-2"
+              className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-lg disabled:opacity-50 flex justify-center items-center gap-2"
             >
-              {loading ? 'Submitting...' : 'Register Issue'}
+              {loading ? 'Submitting...' : 'Submit Request'}
             </button>
           </form>
         </section>
 
         {/* Tickets History */}
         <section className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-400" />
-              <h2 className="text-base font-bold text-white">Your Lodged Tickets</h2>
-            </div>
+          <div className="flex justify-between items-center mb-6 px-1">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Clock className="w-6 h-6 text-slate-400" /> Your History
+            </h2>
             <button 
               onClick={fetchTickets}
               disabled={refreshing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white rounded-lg border border-slate-700/80 text-xs font-medium transition disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full border border-slate-200 text-sm font-bold transition shadow-sm disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-indigo-400 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Sync</span>
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </button>
           </div>
 
-          <div className="space-y-3.5">
+          <div className="space-y-4">
             {tickets.length === 0 ? (
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3">
-                  <CheckCircle className="w-6 h-6 text-slate-500" />
+              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center flex flex-col items-center shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 border border-slate-100">
+                  <CheckCircle className="w-8 h-8 text-slate-300" />
                 </div>
-                <p className="text-slate-300 font-medium text-sm">No ongoing requests</p>
-                <p className="text-slate-500 text-xs mt-1">Submitted room issues will appear here in real time.</p>
+                <h3 className="text-lg font-bold text-slate-800">All caught up!</h3>
+                <p className="text-slate-500 font-medium text-sm mt-1">You have no active maintenance requests.</p>
               </div>
             ) : (
               tickets.map(ticket => (
-                <div key={ticket._id} className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 hover:border-slate-700 transition">
+                <div key={ticket._id} className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row gap-5 hover:shadow-md hover:border-slate-300 transition-all">
                   {ticket.imageUrl && (
-                    <img src={ticket.imageUrl} alt="Defect" className="w-full sm:w-36 h-28 object-cover rounded-xl border border-slate-800" />
+                    <img src={ticket.imageUrl} alt="Defect" className="w-full sm:w-40 h-32 object-cover rounded-xl border border-slate-100" />
                   )}
-                  <div className="flex-1 flex flex-col justify-between py-0.5">
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-xs font-bold text-indigo-300 bg-indigo-950/70 border border-indigo-800/50 px-2.5 py-0.5 rounded-md">
-                          {ticket.category} • Room {ticket.roomNumber}
-                        </span>
-                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
-                          ticket.status === 'Pending' ? 'bg-amber-950/50 text-amber-300 border-amber-800/60' :
-                          ticket.status === 'Assigned' ? 'bg-blue-950/50 text-blue-300 border-blue-800/60' :
-                          'bg-emerald-950/50 text-emerald-300 border-emerald-800/60'
-                        }`}>
-                          {ticket.status}
-                        </span>
-                      </div>
-                      <p className="text-slate-300 text-sm leading-relaxed">{ticket.description}</p>
+                  <div className="flex-1 flex flex-col justify-center">
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="text-[11px] font-extrabold text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-md uppercase tracking-wider">
+                        {ticket.category} • Room {ticket.roomNumber}
+                      </span>
+                      <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${
+                        ticket.status === 'Pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                        ticket.status === 'Assigned' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                        'bg-emerald-50 text-emerald-600 border-emerald-200'
+                      }`}>
+                        {ticket.status}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-slate-500 font-medium mt-3">
-                      Recorded on {new Date(ticket.createdAt).toLocaleDateString()}
+                    <p className="text-slate-700 text-[15px] font-medium leading-relaxed">{ticket.description}</p>
+                    <span className="text-xs text-slate-400 font-semibold mt-4 block">
+                      Reported on {new Date(ticket.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                 </div>

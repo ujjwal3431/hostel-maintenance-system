@@ -7,19 +7,21 @@ const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/google', async (req, res) => {
-    const { credential } = req.body; // Token sent from the React frontend
+  try {
+    // 1. FIRST: Extract the token from the frontend request
+    const { token } = req.body; 
 
-    try {
-        // 1. Verify the Google token
-        // 1. The console log must be on its own line OUTSIDE the brackets
-      console.log("THE RENDER CLIENT ID IS:", process.env.GOOGLE_CLIENT_ID);
+    // 2. SECOND: Console log to check the Render environment variable
+    console.log("THE RENDER CLIENT ID IS:", process.env.GOOGLE_CLIENT_ID);
 
-      // 2. Then we verify the token
-      const ticket = await client.verifyIdToken({
-          idToken: token,
-          audience: process.env.GOOGLE_CLIENT_ID
-      });
-        const payload = ticket.getPayload();
+    // 3. THIRD: Verify the token (now it knows what 'token' is!)
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    // ... the rest of your code (finding/creating the user) stays the same ...
         const { sub, email, name } = payload; // 'sub' is the unique Google ID
 
         // 2. Domain Restriction (Core feature for your project)

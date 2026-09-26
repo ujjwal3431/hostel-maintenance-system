@@ -55,8 +55,8 @@ export default function Admin() {
     const columnTickets = tickets.filter(t => t.status === statusName);
     
     return (
-      <div className="flex flex-col h-[calc(100vh-140px)] bg-slate-50/50 border border-slate-200 rounded-3xl overflow-hidden">
-        <div className="p-5 border-b border-slate-200 bg-slate-100/50 flex justify-between items-center">
+      <div className="flex flex-col h-[calc(100vh-140px)] bg-white/40 backdrop-blur-xl border border-white/60 rounded-3xl overflow-hidden shadow-lg shadow-indigo-100/40">
+        <div className="p-5 border-b border-white/50 bg-white/50 flex justify-between items-center">
           <div className="flex items-center gap-2">
             {icon}
             <h2 className={`font-bold text-base ${headerAccent}`}>{statusName}</h2>
@@ -68,12 +68,12 @@ export default function Admin() {
         
         <div className="p-4 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
           {columnTickets.map(ticket => (
-            <div key={ticket._id} className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md rounded-2xl p-5 transition-all duration-200 group">
+            <div key={ticket._id} className="bg-white/80 backdrop-blur-md border border-white hover:border-violet-200 hover:shadow-lg rounded-2xl p-5 transition-all duration-200 group">
               <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-200 shadow-sm">
                   {ticket.category}
                 </span>
-                <span className="text-xs font-extrabold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-md">
+                <span className="text-xs font-extrabold text-violet-700 bg-violet-50 border border-violet-100 shadow-sm px-2.5 py-1 rounded-md">
                   Room {ticket.roomNumber}
                 </span>
               </div>
@@ -92,25 +92,25 @@ export default function Admin() {
                 </div>
               )}
               
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                <div className="bg-white p-1 rounded-full shadow-sm border border-slate-100"><User className="w-3.5 h-3.5 text-slate-400" /></div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-4 bg-white/80 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                <div className="bg-slate-100 p-1 rounded-full border border-slate-200"><User className="w-3.5 h-3.5 text-slate-500" /></div>
                 <span className="truncate">{ticket.studentId?.name || 'Student'}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 mt-auto">
                 {statusName !== 'Pending' && (
                   <button onClick={() => updateStatus(ticket._id, 'Pending')} className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
-                    Reset to Pending
+                    Set Pending
                   </button>
                 )}
                 {statusName !== 'Assigned' && (
-                  <button onClick={() => updateStatus(ticket._id, 'Assigned')} className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm shadow-blue-200">
+                  <button onClick={() => updateStatus(ticket._id, 'Assigned')} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-md shadow-blue-200">
                     Assign Task
                   </button>
                 )}
                 {statusName !== 'Resolved' && (
-                  <button onClick={() => updateStatus(ticket._id, 'Resolved')} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm shadow-emerald-200 col-span-2">
-                    Mark as Resolved
+                  <button onClick={() => updateStatus(ticket._id, 'Resolved')} className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-md shadow-emerald-200 col-span-2">
+                    Mark Resolved
                   </button>
                 )}
               </div>
@@ -118,8 +118,8 @@ export default function Admin() {
           ))}
           
           {columnTickets.length === 0 && (
-            <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 bg-white/50 rounded-2xl text-slate-400 text-sm font-semibold gap-2">
-              <Inbox className="w-6 h-6 opacity-50" />
+            <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-white/60 bg-white/30 rounded-2xl text-slate-500 text-sm font-semibold gap-2">
+              <Inbox className="w-6 h-6 opacity-50 text-violet-400" />
               <span>No tickets in queue</span>
             </div>
           )}
@@ -129,40 +129,42 @@ export default function Admin() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-100 border-t-blue-600"></div>
+    <div className="min-h-screen flex items-center justify-center bg-indigo-50">
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-violet-200 border-t-violet-600"></div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 relative font-sans">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-30" />
+    <div className="min-h-screen bg-indigo-50 text-slate-900 relative font-sans overflow-x-hidden">
+      {/* Colorful Aurora Mesh Background */}
+      <div className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-300/40 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-300/40 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed top-[20%] left-[20%] w-[50%] h-[50%] bg-pink-300/30 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Admin Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-xl border-b border-white/50 shadow-sm">
         <div className="max-w-[1500px] mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-500 flex items-center justify-center shadow-md shadow-fuchsia-200">
               <LayoutDashboard className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
-              <p className="text-xs text-slate-500 font-medium">Hostel Maintenance System</p>
+              <h1 className="text-base font-bold text-slate-800 tracking-tight">Admin Dashboard</h1>
+              <p className="text-xs text-slate-600 font-medium">Hostel Maintenance System</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button 
               onClick={fetchAllTickets}
               disabled={refreshing}
-              className="flex items-center gap-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-4 py-2 rounded-xl transition shadow-sm disabled:opacity-50"
+              className="flex items-center gap-2 text-sm font-bold text-violet-700 bg-white/80 hover:bg-white backdrop-blur-md border border-white px-4 py-2 rounded-xl transition shadow-sm disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} /> 
               <span>{refreshing ? 'Syncing...' : 'Sync Board'}</span>
             </button>
             <button 
               onClick={handleLogout} 
-              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 px-4 py-2 rounded-xl transition shadow-sm"
+              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 bg-white/80 hover:bg-red-50 backdrop-blur-md border border-white hover:border-red-200 px-4 py-2 rounded-xl transition shadow-sm"
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out</span>

@@ -77,25 +77,27 @@ export default function Student() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans pb-12">
-      {/* Subtle Background Pattern */}
-      <div className="fixed inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
+    <div className="min-h-screen bg-indigo-50 text-slate-800 relative font-sans pb-12 overflow-x-hidden">
+      {/* Colorful Aurora Mesh Background */}
+      <div className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-300/40 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-300/40 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed top-[20%] left-[20%] w-[50%] h-[50%] bg-pink-300/30 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Crisp White Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      {/* Glass Header */}
+      <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-xl border-b border-white/50 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-md shadow-violet-200">
               <Wrench className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-800 tracking-tight">Student Portal</h1>
-              <p className="text-xs text-slate-500 font-medium hidden sm:block">GKV Hostel Maintenance</p>
+              <p className="text-xs text-slate-600 font-medium hidden sm:block">GKV Hostel Maintenance</p>
             </div>
           </div>
           <button 
             onClick={handleLogout} 
-            className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 bg-white hover:bg-red-50 px-4 py-2 rounded-xl transition border border-slate-200 hover:border-red-200 shadow-sm"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 bg-white/80 backdrop-blur-sm hover:bg-red-50 px-4 py-2 rounded-xl transition border border-white/80 hover:border-red-200 shadow-sm"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -106,9 +108,9 @@ export default function Student() {
       {/* Main Grid Content */}
       <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Issue Submission Box */}
-        <section className="lg:col-span-1 bg-white border border-slate-200 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24">
+        <section className="lg:col-span-1 bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-7 shadow-xl shadow-indigo-100/50 sticky top-24">
           <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+            <div className="p-2 rounded-lg bg-violet-100/80 text-violet-600">
               <Send className="w-5 h-5" />
             </div>
             <h2 className="text-lg font-bold text-slate-800">New Request</h2>
@@ -118,7 +120,7 @@ export default function Student() {
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Category</label>
               <select 
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium"
+                className="w-full bg-white/80 border border-white text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition font-medium shadow-sm"
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
               >
@@ -134,7 +136,7 @@ export default function Student() {
               <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Room Number</label>
               <input 
                 type="number" min="1" required placeholder="e.g. 204"
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium placeholder-slate-400"
+                className="w-full bg-white/80 border border-white text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition font-medium placeholder-slate-400 shadow-sm"
                 value={formData.roomNumber}
                 onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}
               />
@@ -144,7 +146,7 @@ export default function Student() {
               <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Description</label>
               <textarea 
                 required rows="3" placeholder="Describe the problem in detail..."
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition font-medium resize-none placeholder-slate-400"
+                className="w-full bg-white/80 border border-white text-slate-800 text-sm p-3 rounded-xl focus:bg-white focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none transition font-medium resize-none placeholder-slate-400 shadow-sm"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
@@ -152,17 +154,17 @@ export default function Student() {
 
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Photo (Max 5MB)</label>
-              <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-5 text-center bg-slate-50 hover:bg-blue-50/50 hover:border-blue-300 transition-all cursor-pointer group">
+              <div className="relative border-2 border-dashed border-violet-200/60 rounded-xl p-5 text-center bg-white/50 hover:bg-violet-50/50 hover:border-violet-300 transition-all cursor-pointer group">
                 <input 
                   type="file" accept="image/*"
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
                 <div className="flex flex-col items-center justify-center gap-2">
-                  <div className="bg-white p-2 rounded-full shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
-                    <ImageIcon className="w-5 h-5 text-blue-500" />
+                  <div className="bg-white/80 p-2 rounded-full shadow-sm border border-white group-hover:scale-110 transition-transform">
+                    <ImageIcon className="w-5 h-5 text-violet-500" />
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 truncate max-w-[200px]">
+                  <span className="text-xs font-semibold text-slate-600 truncate max-w-[200px]">
                     {image ? image.name : 'Click to attach photo'}
                   </span>
                 </div>
@@ -171,7 +173,7 @@ export default function Student() {
 
             <button 
               type="submit" disabled={loading}
-              className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-md shadow-blue-200 hover:shadow-lg disabled:opacity-50 flex justify-center items-center gap-2"
+              className="w-full mt-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-violet-200 hover:shadow-xl disabled:opacity-50 flex justify-center items-center gap-2"
             >
               {loading ? 'Submitting...' : 'Submit Request'}
             </button>
@@ -182,12 +184,12 @@ export default function Student() {
         <section className="lg:col-span-2">
           <div className="flex justify-between items-center mb-6 px-1">
             <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <Clock className="w-6 h-6 text-slate-400" /> Your History
+              <Clock className="w-6 h-6 text-violet-500" /> Your History
             </h2>
             <button 
               onClick={fetchTickets}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full border border-slate-200 text-sm font-bold transition shadow-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-md text-slate-700 hover:text-violet-600 hover:bg-white rounded-full border border-white text-sm font-bold transition shadow-sm disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -196,25 +198,25 @@ export default function Student() {
 
           <div className="space-y-4">
             {tickets.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center flex flex-col items-center shadow-sm">
-                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 border border-slate-100">
-                  <CheckCircle className="w-8 h-8 text-slate-300" />
+              <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-12 text-center flex flex-col items-center shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-white/80 flex items-center justify-center mb-4 border border-white">
+                  <CheckCircle className="w-8 h-8 text-violet-300" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800">All caught up!</h3>
-                <p className="text-slate-500 font-medium text-sm mt-1">You have no active maintenance requests.</p>
+                <p className="text-slate-600 font-medium text-sm mt-1">You have no active maintenance requests.</p>
               </div>
             ) : (
               tickets.map(ticket => (
-                <div key={ticket._id} className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row gap-5 hover:shadow-md hover:border-slate-300 transition-all">
+                <div key={ticket._id} className="bg-white/80 backdrop-blur-xl border border-white rounded-2xl p-5 flex flex-col sm:flex-row gap-5 hover:shadow-lg hover:border-violet-100 transition-all">
                   {ticket.imageUrl && (
-                    <img src={ticket.imageUrl} alt="Defect" className="w-full sm:w-40 h-32 object-cover rounded-xl border border-slate-100" />
+                    <img src={ticket.imageUrl} alt="Defect" className="w-full sm:w-40 h-32 object-cover rounded-xl border border-slate-100 shadow-sm" />
                   )}
                   <div className="flex-1 flex flex-col justify-center">
                     <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="text-[11px] font-extrabold text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-md uppercase tracking-wider">
+                      <span className="text-[11px] font-extrabold text-slate-600 bg-white border border-slate-200 shadow-sm px-3 py-1 rounded-md uppercase tracking-wider">
                         {ticket.category} • Room {ticket.roomNumber}
                       </span>
-                      <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${
+                      <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border shadow-sm ${
                         ticket.status === 'Pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                         ticket.status === 'Assigned' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                         'bg-emerald-50 text-emerald-600 border-emerald-200'
@@ -223,7 +225,7 @@ export default function Student() {
                       </span>
                     </div>
                     <p className="text-slate-700 text-[15px] font-medium leading-relaxed">{ticket.description}</p>
-                    <span className="text-xs text-slate-400 font-semibold mt-4 block">
+                    <span className="text-xs text-slate-500 font-semibold mt-4 block">
                       Reported on {new Date(ticket.createdAt).toLocaleDateString()}
                     </span>
                   </div>

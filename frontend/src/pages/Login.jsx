@@ -20,30 +20,30 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 bg-slate-50 overflow-hidden font-sans">
-      {/* Light Dot Grid & Soft Glows */}
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-50" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-400/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="relative min-h-screen flex items-center justify-center p-4 bg-indigo-50 overflow-hidden font-sans">
+      {/* Colorful Aurora Mesh Background */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-300/50 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-300/50 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-[20%] left-[20%] w-[50%] h-[50%] bg-pink-300/40 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Main Login Card */}
-      <div className="relative z-10 w-full max-w-md bg-white border border-slate-200/60 rounded-3xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      {/* Main Login Card - Glass effect over the colors */}
+      <div className="relative z-10 w-full max-w-md bg-white/70 backdrop-blur-2xl border border-white/60 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-indigo-200/50">
         <div className="flex justify-center mb-6">
-          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-indigo-200">
+          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-fuchsia-200">
             <Building2 className="w-8 h-8 text-white" />
           </div>
         </div>
 
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold mb-4 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 border border-violet-100 text-violet-600 text-xs font-bold mb-4 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-violet-500" />
             <span>Campus Maintenance</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Hostel Care</h1>
-          <p className="text-slate-500 text-sm mt-2 font-medium">Sign in with your university credentials</p>
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Hostel Care</h1>
+          <p className="text-slate-600 text-sm mt-2 font-medium">Sign in with your university credentials</p>
         </div>
 
-        <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center gap-3">
+        <div className="bg-white/50 backdrop-blur-md border border-white/80 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 shadow-inner">
           <div className="transform hover:-translate-y-0.5 transition-transform">
             <GoogleLogin
               onSuccess={handleLoginSuccess}
@@ -53,8 +53,8 @@ export default function Login() {
               prompt="select_account"
             />
           </div>
-          <p className="text-xs text-slate-400 font-medium text-center mt-2">
-            Restricted to <span className="text-slate-600 font-bold">@gkv.ac.in</span> accounts
+          <p className="text-xs text-slate-500 font-medium text-center mt-2">
+            Restricted to <span className="text-violet-600 font-bold">@gkv.ac.in</span> accounts
           </p>
         </div>
       </div>

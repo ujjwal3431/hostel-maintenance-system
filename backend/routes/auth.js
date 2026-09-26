@@ -11,11 +11,14 @@ router.post('/google', async (req, res) => {
 
     try {
         // 1. Verify the Google token
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            console.log("THE RENDER CLIENT ID IS:", process.env.GOOGLE_CLIENT_ID);
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
+        // 1. The console log must be on its own line OUTSIDE the brackets
+      console.log("THE RENDER CLIENT ID IS:", process.env.GOOGLE_CLIENT_ID);
+
+      // 2. Then we verify the token
+      const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID
+      });
         const payload = ticket.getPayload();
         const { sub, email, name } = payload; // 'sub' is the unique Google ID
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw, LayoutDashboard, History, User, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
+import useSessionTimeout from '../hooks/useSessionTimeout';
 
 export default function Student() {
   const navigate = useNavigate();

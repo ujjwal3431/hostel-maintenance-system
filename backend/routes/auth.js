@@ -48,7 +48,7 @@ router.post('/google', async (req, res) => {
     const jwtToken = jwt.sign(
         { id: user._id, role: user.role }, 
         process.env.JWT_SECRET || 'fallback_secret_key_please_change', 
-        { expiresIn: '7d' }
+        { expiresIn: '2h' } // Options: '15m', '1h', '2h', '8h'
     );
 
     // 8. Send the data back to the frontend to log the user in

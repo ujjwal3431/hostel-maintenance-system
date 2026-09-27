@@ -7,11 +7,37 @@ import {
   Inbox, Settings, PieChart, Activity, Moon, Sun, TrendingUp, AlertTriangle, 
   Building, BarChart3, Sparkles, Wrench, ShieldAlert 
 } from 'lucide-react';
-import useSessionTimeout from '../hooks/useSessionTimeout';
 
+// Self-contained session timeout hook (no external file needed)
+function useLocalSessionTimeout() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const expiresAt = localStorage.getItem('sessionExpiresAt');
+
+    if (!token || !expiresAt) return;
+
+    const remainingTime = parseInt(expiresAt, 10) - Date.now();
+
+    const logout = () => {
+      localStorage.clear();
+      alert('Your session has ended. Please log in again.');
+      navigate('/');
+    };
+
+    if (remainingTime <= 0) {
+      logout();
+      return;
+    }
+
+    const timer = setTimeout(logout, remainingTime);
+    return () => clearTimeout(timer);
+  }, [navigate]);
+}
 export default function Admin() {
   const navigate = useNavigate();
-  useSessionTimeout();
+  useLocalSessionTimeout();
 
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);

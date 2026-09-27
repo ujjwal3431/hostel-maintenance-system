@@ -29,19 +29,25 @@ export default function Login() {
   };
 
   const handleLoginSuccess = async (credentialResponse) => {
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/google`, {
-        token: credentialResponse.credential,
-      });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      navigate(res.data.user.role === 'admin' ? '/admin' : '/student');
-    } catch (error) {
-      console.error("FULL LOGIN ERROR:", error);
-      const errorMsg = error.response?.data?.message || error.message;
-      alert(`System Error: ${errorMsg}`);
-    }
-  };
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/google`, {
+      token: credentialResponse.credential,
+    });
+
+    const SESSION_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+    const expiresAt = Date.now() + SESSION_DURATION;
+
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+    localStorage.setItem('sessionExpiresAt', expiresAt.toString());
+
+    navigate(res.data.user.role === 'admin' ? '/admin' : '/student');
+  } catch (error) {
+    console.error("FULL LOGIN ERROR:", error);
+    const errorMsg = error.response?.data?.message || error.message;
+    alert(`System Error: ${errorMsg}`);
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-8 bg-indigo-50 dark:bg-slate-950 overflow-hidden font-sans transition-colors duration-500">

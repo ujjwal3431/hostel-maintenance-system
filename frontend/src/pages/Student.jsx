@@ -1,40 +1,58 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { motion } from 'framer-motion';
-import { LogOut, Image as ImageIcon, Send, Clock, CheckCircle, Wrench, RefreshCw, LayoutDashboard, History, User, Activity, AlertCircle, Moon, Sun } from 'lucide-react';
-import useSessionTimeout from '../hooks/useSessionTimeout';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  LogOut, PlusCircle, List, Moon, Sun, UploadCloud, 
+  CheckCircle2, Clock, Wrench, Menu, X, LayoutDashboard 
+} from 'lucide-react';
+
+// Self-contained session timeout hook
+function useLocalSessionTimeout() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const expiresAt = localStorage.getItem('sessionExpiresAt');
+
+    if (!token || !expiresAt) return;
+
+    const remainingTime = parseInt(expiresAt, 10) - Date.now();
+
+    const logout = () => {
+      localStorage.clear();
+      alert('Your session has ended. Please log in again.');
+      navigate('/');
+    };
+
+    if (remainingTime <= 0) {
+      logout();
+      return;
+    }
+
+    const timer = setTimeout(logout, remainingTime);
+    return () => clearTimeout(timer);
+  }, [navigate]);
+}
 
 export default function Student() {
   const navigate = useNavigate();
-  const [tickets, setTickets] = useState([]);
-  const [formData, setFormData] = useState({ category: 'Electrical', roomNumber: '', description: '' });
-  const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  useLocalSessionTimeout();
+
+  const [activeTab, setActiveTab] = useState('submit');
   const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const user = JSON.parse(localStorage.getItem('user')) || { name: 'Student' };
-
-  const fetchTickets = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return navigate('/');
-    
-    setRefreshing(true);
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTickets(res.data);
-    } catch (error) {
-      console.error('Error fetching tickets');
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [tickets, setTickets] = useState([]);
+  
+  const [roomNumber, setRoomNumber] = useState('');
+  const [category, setCategory] = useState('Electrical');
+  const [description, setDescription] = useState('');
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchTickets();
+    fetchMyTickets();
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDarkMode(true);
@@ -54,257 +72,304 @@ export default function Student() {
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Image is too large! Please select a file smaller than 5MB.");
-        e.target.value = "";
-        setImage(null);
-        return;
-      }
-      setImage(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const token = localStorage.getItem('token');
-    const data = new FormData();
-    data.append('category', formData.category);
-    data.append('roomNumber', formData.roomNumber);
-    data.append('description', formData.description);
-    if (image) data.append('image', image);
-
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/tickets`, data, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
-      });
-      setTickets([res.data.ticket, ...tickets]);
-      setFormData({ category: 'Electrical', roomNumber: '', description: '' });
-      setImage(null);
-      e.target.reset();
-    } catch (error) {
-      alert('Failed to submit ticket');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.clear();
     navigate('/');
   };
 
-  const getCount = (status) => tickets.filter(t => t.status === status).length;
+  const fetchMyTickets = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return navigate('/');
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/tickets/my-tickets`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTickets(res.data);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit.');
+        return;
+      }
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!roomNumber || isNaN(roomNumber)) {
+      alert('Please enter a valid numeric room number.');
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('roomNumber', roomNumber);
+    formData.append('category', category);
+    formData.append('description', description);
+    if (file) formData.append('image', file);
+
+    const token = localStorage.getItem('token');
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/tickets`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      alert('Ticket submitted successfully!');
+      setRoomNumber('');
+      setCategory('Electrical');
+      setDescription('');
+      setFile(null);
+      setPreview(null);
+      fetchMyTickets();
+      setActiveTab('history');
+    } catch (error) {
+      alert('Error submitting ticket. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'Resolved': return <span className="flex items-center gap-1 text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md border border-emerald-200"><CheckCircle2 className="w-3 h-3"/> Resolved</span>;
+      case 'Assigned': return <span className="flex items-center gap-1 text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md border border-blue-200"><Wrench className="w-3 h-3"/> In Progress</span>;
+      default: return <span className="flex items-center gap-1 text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-md border border-amber-200"><Clock className="w-3 h-3"/> Pending</span>;
+    }
+  };
 
   return (
     <div className="flex h-screen bg-indigo-50 dark:bg-slate-950 font-sans overflow-hidden transition-colors duration-500">
-      <div className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-300/40 dark:bg-purple-900/30 rounded-full blur-[140px] pointer-events-none z-0 transition-colors duration-700" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-300/40 dark:bg-cyan-900/20 rounded-full blur-[140px] pointer-events-none z-0 transition-colors duration-700" />
+      
+      {/* Background Aurora */}
+      <div className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-300/40 dark:bg-purple-900/30 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-300/40 dark:bg-cyan-900/20 rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {/* Sidebar Navigation */}
+      {/* MOBILE OVERLAY */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR */}
       <motion.aside 
-        initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
-        className="w-64 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-r border-white/60 dark:border-slate-800/60 z-10 flex flex-col justify-between shadow-2xl shadow-indigo-200/30 dark:shadow-none"
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-r border-white/60 dark:border-slate-800/60 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div>
-          <div className="h-20 flex items-center gap-3 px-6 border-b border-white/50 dark:border-slate-800/50">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-200 dark:shadow-none">
-              <Wrench className="w-5 h-5 text-white" />
+          <div className="h-20 flex items-center justify-between px-6 border-b border-white/50 dark:border-slate-800/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                <LayoutDashboard className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="font-extrabold text-slate-800 dark:text-white tracking-tight leading-tight">Hostel Care</h1>
+                <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">Student Portal</p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-extrabold text-slate-800 dark:text-white tracking-tight">Hostel Care</h1>
-              <p className="text-[10px] font-bold text-violet-500 dark:text-violet-400 uppercase tracking-widest">Student Portal</p>
-            </div>
-          </div>
-          
-          <div className="px-6 py-5 border-b border-white/50 dark:border-slate-800/50">
-             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1">Welcome back,</p>
-             <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate">{user.name}</p>
+            {/* Mobile Close Button */}
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           <nav className="p-4 space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-violet-100/50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 font-bold rounded-xl border border-violet-200/50 dark:border-violet-800/50 transition">
-              <LayoutDashboard className="w-4 h-4" /> My Dashboard
+            <button 
+              onClick={() => { setActiveTab('submit'); setIsSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 font-bold rounded-xl transition ${
+                activeTab === 'submit' ? 'bg-violet-100/70 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60' : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              <PlusCircle className="w-4 h-4" /> New Request
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-xl transition">
-              <History className="w-4 h-4" /> Full History
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-xl transition">
-              <User className="w-4 h-4" /> Profile
+            <button 
+              onClick={() => { setActiveTab('history'); setIsSidebarOpen(false); fetchMyTickets(); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 font-bold rounded-xl transition ${
+                activeTab === 'history' ? 'bg-violet-100/70 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/60' : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              <List className="w-4 h-4" /> My Tickets
             </button>
           </nav>
         </div>
+
         <div className="p-4 border-t border-white/50 dark:border-slate-800/50 space-y-2">
-          
-          {/* THEME TOGGLE BUTTON */}
-          <button onClick={toggleTheme} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-xl transition">
+          <button onClick={toggleTheme} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-xl transition">
             {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             {isDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
-
-          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-slate-600 dark:text-slate-300 font-bold hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition">
+          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-slate-600 font-bold hover:bg-red-50 hover:text-red-600 rounded-xl transition">
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
         </div>
       </motion.aside>
 
-      {/* Main Content Area */}
+      {/* MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col z-10 relative h-screen overflow-hidden">
-        <header className="h-20 px-8 flex justify-between items-center bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border-b border-white/40 dark:border-slate-800/50">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-white">My Maintenance Hub</h2>
-          <button 
-            onClick={fetchTickets} disabled={refreshing}
-            className="flex items-center gap-2 text-sm font-bold text-violet-700 dark:text-violet-300 bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 backdrop-blur-md border border-white dark:border-slate-700 px-4 py-2.5 rounded-xl transition shadow-sm disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} /> 
-            {refreshing ? 'Syncing...' : 'Sync Records'}
-          </button>
+        {/* Top Navbar */}
+        <header className="h-20 px-4 md:px-8 flex justify-between items-center bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border-b border-white/40 dark:border-slate-800/50">
+          <div className="flex items-center gap-4">
+            {/* Mobile Hamburger Button */}
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2.5 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-white/80 dark:border-slate-700 shadow-sm text-slate-700 dark:text-slate-200"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div>
+              <h2 className="text-sm md:text-lg font-bold text-slate-800 dark:text-white">
+                {activeTab === 'submit' ? 'Submit Maintenance Request' : 'My Ticket History'}
+              </h2>
+            </div>
+          </div>
         </header>
 
-        <div className="p-8 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-8">
-          
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex items-center gap-4 transition-colors">
-              <div className="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl"><Activity className="w-6 h-6" /></div>
-              <div>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Reports</p>
-                <p className="text-2xl font-extrabold text-slate-800 dark:text-white">{tickets.length}</p>
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex items-center gap-4 transition-colors">
-              <div className="p-3 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-xl"><AlertCircle className="w-6 h-6" /></div>
-              <div>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Awaiting Fix</p>
-                <p className="text-2xl font-extrabold text-slate-800 dark:text-white">{getCount('Pending')}</p>
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm flex items-center gap-4 transition-colors">
-              <div className="p-3 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-xl"><CheckCircle className="w-6 h-6" /></div>
-              <div>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resolved</p>
-                <p className="text-2xl font-extrabold text-slate-800 dark:text-white">{getCount('Resolved')}</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <motion.section 
-              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-              className="lg:col-span-1 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/80 dark:border-slate-800/80 rounded-3xl p-7 shadow-lg shadow-indigo-100/50 dark:shadow-none sticky top-4 h-fit transition-colors"
-            >
-              <div className="flex items-center gap-2 mb-6">
-                <div className="p-2 rounded-lg bg-violet-100/80 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400"><Send className="w-5 h-5" /></div>
-                <h2 className="text-lg font-bold text-slate-800 dark:text-white">New Request</h2>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Category</label>
-                  <select 
-                    className="w-full bg-white/80 dark:bg-slate-800 border border-white dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm p-3 rounded-xl focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 outline-none transition font-medium shadow-sm"
-                    value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  >
-                    <option>Electrical</option><option>Plumbing</option><option>Carpentry</option><option>Cleaning</option><option>Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Room Number</label>
-                  <input 
-                    type="number" min="1" required placeholder="e.g. 204"
-                    className="w-full bg-white/80 dark:bg-slate-800 border border-white dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm p-3 rounded-xl focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 outline-none transition font-medium placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
-                    value={formData.roomNumber} onChange={(e) => setFormData({...formData, roomNumber: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                  <textarea 
-                    required rows="3" placeholder="Describe the problem..."
-                    className="w-full bg-white/80 dark:bg-slate-800 border border-white dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm p-3 rounded-xl focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 outline-none transition font-medium resize-none placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
-                    value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Photo (Max 5MB)</label>
-                  <div className="relative border-2 border-dashed border-violet-200/60 dark:border-violet-500/30 rounded-xl p-5 text-center bg-white/50 dark:bg-slate-800/50 hover:bg-violet-50/50 dark:hover:bg-slate-800 transition-all cursor-pointer group">
-                    <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="bg-white/80 dark:bg-slate-700 p-2 rounded-full shadow-sm border border-white dark:border-slate-600 group-hover:scale-110 transition-transform"><ImageIcon className="w-5 h-5 text-violet-500 dark:text-violet-400" /></div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 truncate max-w-[200px]">{image ? image.name : 'Click to attach photo'}</span>
+        {/* Scrollable View Area */}
+        <div className="p-4 md:p-8 flex-1 overflow-y-auto custom-scrollbar">
+          <AnimatePresence mode="wait">
+            {activeTab === 'submit' ? (
+              <motion.div 
+                key="submit-form"
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                className="max-w-2xl mx-auto bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/80 dark:border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-xl shadow-indigo-100/50 dark:shadow-none"
+              >
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Room Number</label>
+                      <input 
+                        type="text" 
+                        value={roomNumber} 
+                        onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ''))} // Numeric validation
+                        required 
+                        placeholder="e.g. 101"
+                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-violet-500 outline-none transition"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Category</label>
+                      <select 
+                        value={category} 
+                        onChange={(e) => setCategory(e.target.value)} 
+                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-violet-500 outline-none transition"
+                      >
+                        <option value="Electrical">Electrical</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Carpentry">Carpentry</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Other">Other</option>
+                      </select>
                     </div>
                   </div>
-                </div>
-                <button 
-                  type="submit" disabled={loading}
-                  className="w-full mt-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-violet-200 dark:shadow-none disabled:opacity-50 flex justify-center items-center gap-2"
-                >
-                  {loading ? 'Submitting...' : 'Submit Request'}
-                </button>
-              </form>
-            </motion.section>
 
-            <motion.section 
-              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-              className="lg:col-span-2"
-            >
-              <div className="flex items-center gap-2 mb-6">
-                <Clock className="w-5 h-5 text-violet-500 dark:text-violet-400" />
-                <h2 className="text-lg font-bold text-slate-800 dark:text-white">Recent Activity</h2>
-              </div>
-              
-              <div className="space-y-4">
-                {tickets.length === 0 ? (
-                  <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/60 dark:border-slate-800/80 rounded-3xl p-12 text-center flex flex-col items-center shadow-sm">
-                    <div className="w-16 h-16 rounded-full bg-white/80 dark:bg-slate-800 flex items-center justify-center mb-4 border border-white dark:border-slate-700">
-                      <CheckCircle className="w-8 h-8 text-violet-300 dark:text-violet-500" />
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Issue Description</label>
+                    <textarea 
+                      value={description} 
+                      onChange={(e) => setDescription(e.target.value)} 
+                      required 
+                      rows="4" 
+                      placeholder="Please describe the problem in detail..."
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-violet-500 outline-none transition resize-none"
+                    ></textarea>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Photo Evidence (Max 5MB)</label>
+                    <div className="flex items-center justify-center w-full">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 dark:border-slate-600 border-dashed rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <UploadCloud className="w-8 h-8 text-violet-500 mb-2" />
+                          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Click to upload image</p>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                      </label>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">No issues reported!</h3>
-                    <p className="text-slate-600 dark:text-slate-400 font-medium text-sm mt-1">Your room maintenance requests will appear here.</p>
+                    {/* Restored Image Preview Block */}
+                    {preview && (
+                      <div className="mt-4 relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 h-40">
+                        <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          type="button" 
+                          onClick={() => { setFile(null); setPreview(null); }}
+                          className="absolute top-2 right-2 bg-slate-900/70 hover:bg-red-600 text-white p-1.5 rounded-lg backdrop-blur-sm transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-violet-200 dark:shadow-none transition-all disabled:opacity-50"
+                  >
+                    {loading ? 'Submitting...' : 'Submit Request'}
+                  </button>
+                </form>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="history-view"
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                className="max-w-5xl mx-auto"
+              >
+                {tickets.length === 0 ? (
+                  <div className="text-center py-20 bg-white/50 dark:bg-slate-900/50 rounded-3xl border border-white dark:border-slate-800">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                    <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">No Tickets Yet</h3>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">You haven't submitted any maintenance requests.</p>
                   </div>
                 ) : (
-                  tickets.map((ticket, index) => (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + (index * 0.05) }}
-                      key={ticket._id} 
-                      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white dark:border-slate-700 rounded-2xl p-5 flex flex-col sm:flex-row gap-5 hover:shadow-lg dark:hover:border-violet-500/50 transition-all"
-                    >
-                      {ticket.imageUrl && (
-                        <div className="w-full sm:w-40 h-32 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden relative group/img">
-                          <img src={ticket.imageUrl} alt="Defect" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
-                          <a href={ticket.imageUrl} target="_blank" rel="noopener noreferrer" className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">View Full</a>
-                        </div>
-                      )}
-                      <div className="flex-1 flex flex-col justify-center">
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          <span className="text-[11px] font-extrabold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm px-3 py-1 rounded-md uppercase tracking-wider">
-                            {ticket.category} • Room {ticket.roomNumber}
+                  // Grid Layout that stacks to 1 column on Mobile, 2 columns on Desktop
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    {tickets.map((ticket, i) => (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+                        key={ticket._id} 
+                        className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">
+                            {ticket.category}
                           </span>
-                          <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border shadow-sm ${
-                            ticket.status === 'Pending' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' :
-                            ticket.status === 'Assigned' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800' :
-                            'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
-                          }`}>
-                            {ticket.status}
-                          </span>
+                          {getStatusBadge(ticket.status)}
                         </div>
-                        <p className="text-slate-700 dark:text-slate-300 text-[15px] font-medium leading-relaxed">{ticket.description}</p>
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-4 block">
-                          Reported on {new Date(ticket.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))
+                        <h4 className="font-bold text-slate-800 dark:text-white text-lg mb-1">Room {ticket.roomNumber}</h4>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm font-medium leading-relaxed mb-4 line-clamp-3">
+                          {ticket.description}
+                        </p>
+                        {ticket.imageUrl && (
+                          <div className="h-32 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                            <img src={ticket.imageUrl} alt="Ticket evidence" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <p className="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-widest">
+                          Submitted on {new Date(ticket.createdAt).toLocaleDateString()}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
                 )}
-              </div>
-            </motion.section>
-
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
     </div>
